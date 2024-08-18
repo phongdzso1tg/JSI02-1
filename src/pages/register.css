@@ -1,0 +1,29 @@
+
+
+.alo{
+    background-color: white;
+    width: 530px;
+    height: 400px;
+    align-items: center;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 100px;
+    padding-bottom: 60px;
+    margin-left: 140px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+ 
+  
+
+  
+}
+.skibidi{
+    background-image: url('https://th.bing.com/th/id/R.e9e576e125e8fc3103f5dfcfbe563fe9?rik=3mFMFCzqhvA1TQ&pid=ImgRaw&r=0');
+}
+.phong{
+    padding-right: 0px;
+    padding-bottom: 20px;
+   
+}
+
+
