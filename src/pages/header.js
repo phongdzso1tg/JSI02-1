@@ -1,35 +1,38 @@
 import React from 'react';
 
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
+import { HomeOutlined, LoginOutlined } from '@ant-design/icons';
 import { ShoppingOutlined } from '@ant-design/icons';
 import { UserOutlined } from '@ant-design/icons';
 import { BulbOutlined } from '@ant-design/icons';
 import { SkinOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import {Avatar, Card } from 'antd';
+import { Avatar, Card } from 'antd';
 
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-const { Meta } = Card;
 
-
-const { Header} = Layout;
 
 
 const HeaderApp = () => {
     const navigate = useNavigate()
+    const avtUser = localStorage.getItem('avtUser')
+    const isLogin = localStorage.getItem('isLogin')
+    const { Meta } = Card;
+
+
+    const { Header } = Layout;
     const contentStyle = {
         height: '590px',
         color: 'white',
         lineHeight: '590px',
         textAlign: 'center',
         background: 'white',
-        
+
 
     };
     const items = [
-      
-        {   
+
+        {
             key: '',
             label: 'Home',
             icon: <HomeOutlined />,
@@ -51,34 +54,53 @@ const HeaderApp = () => {
             icon: <SkinOutlined />,
 
         },
+        avtUser &&
         {
-            key: 'login',
-            label: 'Login',
-            icon: <UserOutlined />
+            disabled: true,
+            className: 'menu-avt',
+            icon: <img style={{ width: 32, height: 32 }} src={avtUser} />
         },
+        !isLogin ?
+            {
+                key: 'login',
+                label: 'Login'
+            } : {
+                key: 'logout',
+                label: 'Logout',
+                icon: <LoginOutlined style={{
+                    fontSize: '18px',
+                    fontWeight: '900',
+                }} />
+            },
 
     ]
-    
+
     const onclick = (e) => {
-        navigate(`/${e.key}`)
+        if (e?.key === 'logout') {
+            localStorage.removeItem('isLogin')
+            localStorage.removeItem('avtUser')
+            return window.location.reload()
+        }
+        navigate(`/${e?.key}`)
+
     }
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     return (
-        
+
         <Layout>
             <Header
 
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    
+
                 }}
             >
-                
+
                 <div className="demo-logo" />
-                
+
                 <Menu
                     theme="dark"
                     mode="horizontal"
@@ -94,14 +116,14 @@ const HeaderApp = () => {
                 />
 
             </Header>
-       
-         
+
+
 
         </Layout>
 
-        
-        
-        
+
+
+
     );
 };
 

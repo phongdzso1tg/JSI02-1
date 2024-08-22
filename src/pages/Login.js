@@ -1,219 +1,158 @@
-//  import React from 'react'
-
-// //       function Login() {
-// //    return (
-// //      <div>Login</div>
-// //    )
-// //  };
-
-// // export default Login
-
-// // import React from 'react'
-
-// // export const Login = () => {
-// //   return (
-// //     <div>Login</div>
-// //   )
-// // }
-
-// // import React from 'react' 
-
-// // function Login () {
-// //  const sum = (a,b) => a + b
-// //  console.log(sum(5,5))
-
-// //     return (
-
-// //         <div>Login</div>
-// //     )
-// // }
-// // export default Login
-
-// // import React, { useState } from 'react' 
-
-// // function Login ({abc}) {
-// //     return (
-// //         <div>{abc}</div>
-// //     )
-// // }
-// // export default Login
-
-// // function Login({user}) {
-// //     const [age, setAge] = useState(1)
-
-// //     return(
-
-// //         <div>
-
-// //          <div>{age}</div>
-// //          <button onClick={() => setAge(age + 1)}>Btn</button>
-// //         </div>
-
-// //     )
-// // }
-// // export default Login
 
 
-// // function Login({user}) {
-// //     const [date, setData] = useState()
-    
-
-// //     useEffect(() => {console.log(user)},[])
-
-// //  return(
-// //     <div>
-// //         <div>{}</div>
-// //         <button onClick={() => setAge(age + 5)}>Btn</button>
-// //     </div>
-// //  )
-
-// // }
-
-// // export default Login
-
-import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, message } from 'antd';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import { Content } from 'antd/es/layout/layout';
-import './login.css'
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './login.css';
+import { checkEmail } from './checkEmail';
 
 
 function Login({ user }) {
-    const [data, setData] = useState()
+  const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate()
+  const [data, setData] = useState()
+  const [email, setEmail] = useState()
+  const [password, setPassword] = useState()
 
-    const getApi = async () => {
-        const url = 'https://covid-193.p.rapidapi.com/statistics';
-        const options = {
-            method: 'GET',
-            headers: {
-                'X-RapidAPI-Key': 'c5578c00c3mshc8fc39cff39344fp1489bcjsnc77c1abf2807',
-                'X-RapidAPI-Host': 'covid-193.p.rapidapi.com'
-            }
-        };
-        try {
-            const response = await fetch(url, options);
-            const result = await response.json();
-            console.log("🤔🤔🤔 ~ getApi ~ result:", result)
-            setData(result.response)
-        } catch (error) {
-            console.error(error);
-        }
+  const onFinish = (values) => {
+    console.log('Success:', values);
+  };
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+
+
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const result = await firebase.auth().signInWithPopup(provider);
+      const user = result.user;
+      if (user && user.multiFactor) {
+        localStorage.setItem('avtUser', user.multiFactor?.user?.photoURL ?? '')
+        localStorage.setItem('isLogin', true)
+      }
+      navigate('/')
+    } catch (error) {
+      console.log(error.message);
     }
+  }
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
-      };
-      const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-      };
-
-    useEffect(() => {
-        getApi()
-    }, [])
-
-    console.log("🤔🤔🤔 ~ useEffect ~ data:", data)
-
-    const handleGoogleLogin = async () => {
-        try {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            await firebase.auth().signInWithPopup(provider);
-        } catch (error) {
-            console.log(error.message);
-        }
+  const handleLogin = () => {
+    if (email !== '' || password !== '') {
+      if (checkEmail(email, password, 'login')) {
+        messageApi.open({
+          type: 'success',
+          content: 'Login Success',
+        });
+        localStorage.setItem('isLogin', true)
+        setTimeout(() => {
+          navigate('/')
+        }, 1000);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Login Failure',
+        });
+      }
+    } else {
+      messageApi.open({
+        type: 'warning',
+        content: 'Please enter a values!',
+      });
     }
-    const handleEmailLogin = async (values) => {
-        try {
-            await firebase.auth().signInWithEmailAndPassword(values.email, values.password);
-        } catch (error) {
-            console.log(error.message);
-        }
-    }
+  }
 
-    return (
-      <div className='skibidi' style={{paddingLeft:370,paddingBottom:200,
-      paddingTop:220 }}>
-     <div className='alo'>
+  return (
+    <div className='skibidi' style={{
+      paddingLeft: 370, paddingBottom: 200,
+      paddingTop: 220
+    }}>
+      {contextHolder}
+
+      <div className='alo'>
         <Form
-    name="basic"
-    labelCol={{
-      span: 8,
-    }}
-    wrapperCol={{
-      span: 16,
-    }}
-    style={{
-      maxWidth: 600,
-    }}
-    initialValues={{
-      remember: true,
-    }}
-    onFinish={handleEmailLogin}
-    onFinishFailed={onFinishFailed}
-    autoComplete="off"
-  >
-    <div><h1 className='phong'>Login  </h1></div>
-    <Form.Item 
-    
-      label="Email"
-      name="email"
-      rules={[
-        {
-          required: true,
-          message: 'Please input your username!',
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
+          name="basic"
+          labelCol={{
+            span: 8,
+          }}
+          wrapperCol={{
+            span: 16,
+          }}
+          style={{
+            maxWidth: 600,
+          }}
+          initialValues={{
+            remember: true,
+          }}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+        >
+          <div><h1 className='phong'>Login  </h1></div>
+          <Form.Item
 
-    <Form.Item
-      label="Password"
-      name="password"
-      rules={[
-        {
-          required: true,
-          message: 'Please input your password!',
-        },
-      ]}
-    >
-      <Input.Password />
-    </Form.Item>
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: 'Please input your username!',
+              },
+            ]}
+          >
+            <Input type='email' onChange={(e) => setEmail(e.target.value)} />
 
-    <Form.Item
-      name="remember"
-      valuePropName="checked"
-      wrapperCol={{
-        offset: 8,
-        span: 16,
-      }}
-    >
-      <div className='loginA'>
-      <Checkbox className="ad">Remember me</Checkbox>
-       <li><a  href="register">Don't have account ?</a></li>
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: 'Please input your password!',
+              },
+            ]}
+          >
+            <Input.Password onChange={(e) => setPassword(e.target.value)} />
+          </Form.Item>
+
+          <Form.Item
+            name="remember"
+            valuePropName="checked"
+            wrapperCol={{
+              offset: 8,
+              span: 16,
+            }}
+          >
+            <div className='loginA'>
+              <Checkbox className="ad">Remember me</Checkbox>
+              <li><Link to='/register'>Don't have account ?</Link></li>
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            wrapperCol={{
+              offset: 8,
+              span: 16,
+            }}
+          >
+            <Button style={{ marginRight: 20 }} type="primary" onClick={() => handleLogin()}>
+              Login
+            </Button>
+
+            <Button type="primary" onClick={() => handleGoogleLogin()}>
+              Google
+            </Button>
+
+
+          </Form.Item>
+        </Form>
       </div>
-    </Form.Item>
-
-    <Form.Item
-      wrapperCol={{
-        offset: 8,
-        span: 16,
-      }}
-    >
-      <Button type="primary" htmlType="submit">
-        Submit
-      </Button>
-
-      <Button type="primary" style={{margin:20}} onClick={handleGoogleLogin} >
-        Google
-      </Button>
-      
-      
-    </Form.Item>
-  </Form>
-  </div>
-  </div>
-);
+    </div>
+  );
 
 }
 
